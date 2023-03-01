@@ -1,0 +1,20 @@
+{
+  "name": "app",
+  "authors": [
+    "Beatriz Bravo Gallardo <beatriz.bravo@globant.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "^1.8.3"
+  }
+}

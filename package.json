@@ -1,0 +1,19 @@
+{
+  "name": "angular",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "bower": "^1.8.14",
+    "jasmine": "^4.5.0",
+    "karma": "^6.4.1",
+    "karma-browserify": "^8.1.0",
+    "karma-jasmine": "^5.1.0",
+    "karma-phantomjs-launcher": "^1.0.4"
+  }
+}
