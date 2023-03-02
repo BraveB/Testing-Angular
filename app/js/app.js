@@ -28,7 +28,7 @@ let testingAngularApp = angular
       >
       <button ng-click="onRemove()">Remove</button>
       <button ng-click="getWeather(destination)">Update Weather</button>`,
-      controller: function ($http, $rootScope, $scope) {
+      controller: function ($http, $rootScope, $scope, conversionService) {
         $scope.getWeather = function (destination) {
           $http
             .get(
@@ -42,23 +42,25 @@ let testingAngularApp = angular
                 if (response.data.weather) {
                   destination.weather = {};
                   destination.weather.main = response.data.weather[0].main;
-                  destination.weather.temp = $scope.convertKelvinToCelsius(
-                    response.data.main.temp
-                  );
+                  destination.weather.temp =
+                    conversionService.convertKelvinToCelsius(
+                      response.data.main.temp
+                    );
                 } else {
                   $rootScope.message = 'city not found';
                 }
               },
               function errorCallback(error) {
-                console.log(error);
                 $rootScope.message = 'server error';
               }
             );
         };
-        $scope.convertKelvinToCelsius = function (temp) {
-          return Math.round(temp - 273);
-        };
       },
+    };
+  })
+  .service('conversionService', function () {
+    this.convertKelvinToCelsius = function (temp) {
+      return Math.round(temp - 273);
     };
   });
 testingAngularApp.controller(
