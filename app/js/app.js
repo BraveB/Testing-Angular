@@ -1,4 +1,20 @@
-let testingAngularApp = angular.module('testingAngularApp', []);
+let testingAngularApp = angular
+  .module('testingAngularApp', [])
+  .filter('warmestDestinations', function () {
+    return function (destinations, minimumTemp) {
+      var warmestDestinations = [];
+      angular.forEach(destinations, function (destination) {
+        if (
+          destination.weather &&
+          destination.weather.temp &&
+          destination.weather.temp >= minimumTemp
+        ) {
+          warmestDestinations.push(destination);
+        }
+      });
+      return warmestDestinations;
+    };
+  });
 testingAngularApp.controller(
   'testingAngularController',
   function ($rootScope, $scope, $http, $timeout) {
