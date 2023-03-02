@@ -14,6 +14,7 @@
     "karma": "^6.4.1",
     "karma-browserify": "^8.1.0",
     "karma-jasmine": "^5.1.0",
+    "karma-ng-html2js-preprocessor": "^1.0.0",
     "karma-phantomjs-launcher": "^1.0.4"
   }
 }
