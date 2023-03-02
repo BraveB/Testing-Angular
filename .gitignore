@@ -10,7 +10,7 @@
 /out/
 
 # testing
-/coverage
+/app/js/test/coverage
 
 /src/infra/pwa/sw.js
 
