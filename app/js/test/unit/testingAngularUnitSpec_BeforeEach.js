@@ -138,6 +138,8 @@ describe('Testing Angular Test Suite', function () {
       isolateScope.onRemove();
       expect(scope.removeTest).toBe(2);
     });
+    // to run only one test add f before it
+    // fit('should generae the correct HTML', () => {
     it('should generae the correct HTML', () => {
       let templateAsHTML = template.html();
       expect(templateAsHTML).toContain('tokyo, japan');
