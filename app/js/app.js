@@ -14,6 +14,52 @@ let testingAngularApp = angular
       });
       return warmestDestinations;
     };
+  })
+  .directive('destinationDirective', function () {
+    return {
+      scope: {
+        destination: '=',
+        apiKey: '=',
+        onRemove: '&',
+      },
+      template: `<span>{{destination.city}}, {{destination.country}}</span>
+      <span ng-if="destination.weather"
+        >{{destination.weather.main}}-{{destination.weather.temp}}</span
+      >
+      <button ng-click="onRemove()">Remove</button>
+      <button ng-click="getWeather(destination)">Update Weather</button>`,
+      controller: function ($http, $rootScope, $scope) {
+        $scope.getWeather = function (destination) {
+          $http
+            .get(
+              'http://api.openweathermap.org/data/2.5/weather?q=' +
+                destination.city +
+                '&appid=' +
+                $scope.apiKey
+            )
+            .then(
+              function successCallback(response) {
+                if (response.data.weather) {
+                  destination.weather = {};
+                  destination.weather.main = response.data.weather[0].main;
+                  destination.weather.temp = $scope.convertKelvinToCelsius(
+                    response.data.main.temp
+                  );
+                } else {
+                  $rootScope.message = 'city not found';
+                }
+              },
+              function errorCallback(error) {
+                console.log(error);
+                $rootScope.message = 'server error';
+              }
+            );
+        };
+        $scope.convertKelvinToCelsius = function (temp) {
+          return Math.round(temp - 273);
+        };
+      },
+    };
   });
 testingAngularApp.controller(
   'testingAngularController',
@@ -37,41 +83,11 @@ testingAngularApp.controller(
     $scope.removeDestination = function (index) {
       $scope.destinations.splice(index, 1);
     };
-    $scope.getWeather = function (destination) {
-      $http
-        .get(
-          'http://api.openweathermap.org/data/2.5/weather?q=' +
-            destination.city +
-            '&appid=' +
-            $scope.apiKey
-        )
-        .then(
-          function successCallback(response) {
-            if (response.data.weather) {
-              destination.weather = {};
-              destination.weather.main = response.data.weather[0].main;
-              destination.weather.temp = $scope.convertKelvinToCelsius(
-                response.data.main.temp
-              );
-            } else {
-              $scope.message = 'city not found';
-            }
-          },
-          function errorCallback(error) {
-            console.log(error);
-            $scope.message = 'server error';
-          }
-        );
-    };
 
-    $scope.convertKelvinToCelsius = function (temp) {
-      return Math.round(temp - 273);
-    };
-
-    $scope.messageWatcher = $scope.$watch('message', function () {
-      if ($scope.message) {
+    $rootScope.messageWatcher = $rootScope.$watch('message', function () {
+      if ($rootScope.message) {
         $timeout(function () {
-          $scope.message = null;
+          $rootScope.message = null;
         }, 3000);
       }
     });
