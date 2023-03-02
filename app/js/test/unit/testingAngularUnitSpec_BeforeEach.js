@@ -99,9 +99,10 @@ describe('Testing Angular Test Suite', function () {
     }));
   });
   describe('testing angularjs directive', () => {
-    let scope, template, isolateScope;
+    let scope, template, isolateScope, rootScope;
     beforeEach(inject(function ($compile, $rootScope, $httpBackend) {
       scope = $rootScope.$new();
+      rootScope = $rootScope;
       httpBackend = $httpBackend;
       scope.destination = { city: 'tokyo', country: 'japan' };
       scope.apiKey = 'xyz';
@@ -112,6 +113,7 @@ describe('Testing Angular Test Suite', function () {
       scope.$digest();
       isolateScope = element.isolateScope();
     }));
+
     it('should update the weather for a specific destination', function () {
       scope.destination = { city: 'Melbourne', country: 'Australia' };
       httpBackend
@@ -130,6 +132,37 @@ describe('Testing Angular Test Suite', function () {
       expect(scope.destination.weather.main).toBe('Rain');
       expect(scope.destination.weather.temp).toBe(15);
     });
+
+    it('should add a message if no city is found', function () {
+      scope.destination = { city: 'Melbourne', country: 'Australia' };
+      httpBackend
+        .expectGET(
+          'http://api.openweathermap.org/data/2.5/weather?q=' +
+            scope.destination.city +
+            '&appid=' +
+            scope.apiKey
+        )
+        .respond({});
+      isolateScope.getWeather(scope.destination);
+      httpBackend.flush();
+      expect(rootScope.message).toBe('city not found');
+    });
+
+    it('should add a message when there is a server error', function () {
+      scope.destination = { city: 'Melbourne', country: 'Australia' };
+      httpBackend
+        .expectGET(
+          'http://api.openweathermap.org/data/2.5/weather?q=' +
+            scope.destination.city +
+            '&appid=' +
+            scope.apiKey
+        )
+        .respond(500);
+      isolateScope.getWeather(scope.destination);
+      httpBackend.flush();
+      expect(rootScope.message).toBe('server error');
+    });
+
     it('should call the parent controller remove function', () => {
       scope.removeTest = 1;
       scope.remove = () => {
@@ -140,7 +173,7 @@ describe('Testing Angular Test Suite', function () {
     });
     // to run only one test add f before it
     // fit('should generae the correct HTML', () => {
-    it('should generae the correct HTML', () => {
+    it('should generate the correct HTML', () => {
       let templateAsHTML = template.html();
       expect(templateAsHTML).toContain('tokyo, japan');
 
