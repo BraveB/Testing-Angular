@@ -1,7 +1,7 @@
 let testingAngularApp = angular.module('testingAngularApp', []);
 testingAngularApp.controller(
   'testingAngularController',
-  function ($rootScope, $scope, $http) {
+  function ($rootScope, $scope, $http, $timeout) {
     $scope.title = 'testing angularjs application';
 
     $scope.destinations = [];
@@ -32,22 +32,32 @@ testingAngularApp.controller(
         .then(
           function successCallback(response) {
             if (response.data.weather) {
+              destination.weather = {};
+              destination.weather.main = response.data.weather[0].main;
+              destination.weather.temp = $scope.convertKelvinToCelsius(
+                response.data.main.temp
+              );
+            } else {
+              $scope.message = 'city not found';
             }
-            destination.weather = {};
-            destination.weather.main = response.data.weather[0].main;
-            destination.weather.temp = $scope.convertKelvinToCelsius(
-              response.data.main.temp
-            );
-
-            console.log(destination.weather);
           },
           function errorCallback(error) {
             console.log(error);
+            $scope.message = 'server error';
           }
         );
     };
+
     $scope.convertKelvinToCelsius = function (temp) {
       return Math.round(temp - 273);
     };
+
+    $scope.messageWatcher = $scope.$watch('message', function () {
+      if ($scope.message) {
+        $timeout(function () {
+          $scope.message = null;
+        }, 3000);
+      }
+    });
   }
 );

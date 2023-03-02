@@ -1,11 +1,17 @@
 describe('Testing Angular Test Suite', function () {
   beforeEach(module('testingAngularApp'));
   describe('testing angular controller', function () {
-    let scope, ctrl, httpBackend;
-    beforeEach(inject(function ($controller, $rootScope, $httpBackend) {
+    let scope, ctrl, httpBackend, timeout;
+    beforeEach(inject(function (
+      $controller,
+      $rootScope,
+      $httpBackend,
+      $timeout
+    ) {
       scope = $rootScope.$new();
       ctrl = $controller('testingAngularController', { $scope: scope });
       httpBackend = $httpBackend;
+      timeout = $timeout;
     }));
     afterEach(function () {
       httpBackend.verifyNoOutstandingExpectation();
@@ -62,6 +68,7 @@ describe('Testing Angular Test Suite', function () {
 
       expect(scope.destinations.length).toBe(0);
     });
+
     it('should update the weather for a specific destination', function () {
       scope.destination = { city: 'Melbourne', country: 'Australia' };
       httpBackend
@@ -79,6 +86,16 @@ describe('Testing Angular Test Suite', function () {
       httpBackend.flush();
       expect(scope.destination.weather.main).toBe('Rain');
       expect(scope.destination.weather.temp).toBe(15);
+    });
+
+    it('should remove error message after a fixed period of time', function () {
+      scope.message = 'Error';
+      expect(scope.message).toBe('Error');
+
+      scope.$apply();
+      timeout.flush();
+
+      expect(scope.message).toBeNull();
     });
   });
 });
