@@ -52,6 +52,10 @@ let testingAngularApp = angular
               },
               function errorCallback(error) {
                 $rootScope.message = 'server error';
+                $rootScope.$broadcast('messageUpdated', {
+                  type: 'error',
+                  message: 'server error',
+                });
               }
             );
         };

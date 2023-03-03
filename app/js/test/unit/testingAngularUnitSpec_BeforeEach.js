@@ -110,10 +110,17 @@ describe('Testing Angular Test Suite', function () {
         $provide.value('conversionService', MockedConversionService);
       });
     });
-    beforeEach(inject(function ($compile, $rootScope, $httpBackend) {
+    beforeEach(inject(function (
+      $compile,
+      $rootScope,
+      $httpBackend,
+      _conversionService_
+    ) {
       scope = $rootScope.$new();
       rootScope = $rootScope;
       httpBackend = $httpBackend;
+      conversionService = _conversionService_;
+
       scope.destination = { city: 'tokyo', country: 'japan' };
       scope.apiKey = 'xyz';
       let element = angular.element(
@@ -125,6 +132,11 @@ describe('Testing Angular Test Suite', function () {
     }));
 
     it('should update the weather for a specific destination', function () {
+      spyOn(conversionService, 'convertKelvinToCelsius').and.callFake(function (
+        temp
+      ) {
+        return temp - 273;
+      });
       scope.destination = { city: 'Melbourne', country: 'Australia' };
       httpBackend
         .expectGET(
@@ -141,6 +153,9 @@ describe('Testing Angular Test Suite', function () {
       httpBackend.flush();
       expect(scope.destination.weather.main).toBe('Rain');
       expect(scope.destination.weather.temp).toBe(15);
+      expect(conversionService.convertKelvinToCelsius).toHaveBeenCalledWith(
+        288
+      );
     });
 
     it('should add a message if no city is found', function () {
@@ -159,6 +174,7 @@ describe('Testing Angular Test Suite', function () {
     });
 
     it('should add a message when there is a server error', function () {
+      spyOn(rootScope, '$broadcast');
       scope.destination = { city: 'Melbourne', country: 'Australia' };
       httpBackend
         .expectGET(
@@ -171,6 +187,12 @@ describe('Testing Angular Test Suite', function () {
       isolateScope.getWeather(scope.destination);
       httpBackend.flush();
       expect(rootScope.message).toBe('server error');
+      expect(rootScope.$broadcast).toHaveBeenCalled();
+      expect(rootScope.$broadcast).toHaveBeenCalledWith('messageUpdated', {
+        type: 'error',
+        message: 'server error',
+      });
+      expect(rootScope.$broadcast.calls.count()).toBe(1);
     });
 
     it('should call the parent controller remove function', () => {
